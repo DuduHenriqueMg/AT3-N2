@@ -1,19 +1,32 @@
 package org.example;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import java.io.File;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.List;
+
 
 public class Server {
     public static void main(String[] args) {
 
+        ObjectMapper objectMapper = new ObjectMapper();
 
             try {
+                JsonNode rootNode = objectMapper.readTree(new File("livros.json"));
+
+                // Obtém o nó "livros" do JsonNode
+                JsonNode livrosNode = rootNode.path("livros");
+                List<Livro> listaDeLivros = objectMapper.convertValue(livrosNode, new TypeReference<List<Livro>>() {});
 
                 ServerSocket conexao = new ServerSocket(12345);
-                System.out.println("Esperando");
+                System.out.println("Esperando cliente conectar");
                 Socket socket = conexao.accept();
                 ObjectOutputStream saida = new ObjectOutputStream(socket.getOutputStream());
                 ObjectInputStream entrada = new ObjectInputStream(socket.getInputStream());
@@ -28,7 +41,7 @@ public class Server {
                             break;
                         case 2:
                             mensagem = "Teste 2";
-                            saida.writeObject(mensagem);
+                            listarLivros(listaDeLivros, saida);
                             break;
                         case 3:
 
@@ -37,6 +50,10 @@ public class Server {
 
                             break;
                         case 4:
+                            mensagem = "Teste 4";
+                            saida.writeObject(mensagem);
+                            break;
+                        case 5:
                             mensagem = "Encerrando programa";
                             saida.writeObject(mensagem);
                             return;
@@ -45,7 +62,6 @@ public class Server {
                             break;
                     }
                 }
-
 
             } catch (IOException e) {
                 e.printStackTrace();
@@ -59,8 +75,12 @@ public class Server {
 
     }
 
-    public static void listarLivros(){
+    public static void listarLivros(List<Livro> livros, ObjectOutputStream saida) throws IOException {
 
+        for (Livro livro : livros) {
+            saida.writeObject(livro.toString());
+        }
+        saida.writeObject(null);
     }
     public static void alugarLivro(){
 

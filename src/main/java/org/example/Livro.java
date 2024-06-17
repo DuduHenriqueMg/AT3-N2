@@ -3,17 +3,11 @@ package org.example;
 public class Livro {
 
     private String autor;
-    private String nome;
+    private String titulo;
     private String genero;
     private int exemplares;
 
 
-    public Livro(String autor, String nome, String genero, int exemplares) {
-        this.autor = autor;
-        this.nome = nome;
-        this.genero = genero;
-        this.exemplares = exemplares;
-    }
 
     public String getAutor() {
         return autor;
@@ -23,12 +17,12 @@ public class Livro {
         this.autor = autor;
     }
 
-    public String getNome() {
-        return nome;
+    public String getTitulo() {
+        return titulo;
     }
 
-    public void setNome(String nome) {
-        this.nome = nome;
+    public void setTitulo(String titulo) {
+        this.titulo = titulo;
     }
 
     public String getGenero() {
@@ -49,12 +43,11 @@ public class Livro {
 
     @Override
     public String toString() {
-        return "Livro{" +
+        return "Livro: " +
+                ", nome='" + titulo + '\'' +
                 "autor='" + autor + '\'' +
-                ", nome='" + nome + '\'' +
                 ", genero='" + genero + '\'' +
-                ", exemplares=" + exemplares +
-                '}';
+                ", exemplares=" + exemplares ;
     }
 }
 
