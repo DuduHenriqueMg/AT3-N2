@@ -11,19 +11,22 @@ import java.io.ObjectOutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.List;
+import java.util.Map;
 
 
 public class Server {
+    static ObjectMapper objectMapper = new ObjectMapper();
+
+
     public static void main(String[] args) {
 
-        ObjectMapper objectMapper = new ObjectMapper();
-
             try {
-                JsonNode rootNode = objectMapper.readTree(new File("livros.json"));
+                ObjectMapper objectMapper = new ObjectMapper();
 
-                // Obtém o nó "livros" do JsonNode
-                JsonNode livrosNode = rootNode.path("livros");
-                List<Livro> listaDeLivros = objectMapper.convertValue(livrosNode, new TypeReference<List<Livro>>() {});
+
+                Map<String, List<Livro>> objetoLivros = objectMapper.readValue(new File("livros.json"), new TypeReference<Map<String, List<Livro>>>(){});
+                List<Livro> listaDeLivros = objetoLivros.get("livros");
+
 
                 ServerSocket conexao = new ServerSocket(12345);
                 System.out.println("Esperando cliente conectar");
@@ -33,35 +36,40 @@ public class Server {
 
                 while(true) {
                     String mensagem;
+                    String titulo;
                     Integer escolha = (Integer) entrada.readObject();
                     switch (escolha) {
                         case 1:
                             mensagem = "Teste 1";
-                                saida.writeObject(mensagem);
+                            saida.writeObject(mensagem);
                             break;
                         case 2:
-                            mensagem = "Teste 2";
+
                             listarLivros(listaDeLivros, saida);
+
                             break;
                         case 3:
-
-                            mensagem = "Teste 3";
-                            saida.writeObject(mensagem);
+                            titulo = (String)  entrada.readObject();
+                            devolverOuAlugar("alugar", listaDeLivros, titulo, saida, objetoLivros);
 
                             break;
                         case 4:
-                            mensagem = "Teste 4";
-                            saida.writeObject(mensagem);
+                            titulo = (String)  entrada.readObject();
+                            devolverOuAlugar("devolver", listaDeLivros, titulo, saida, objetoLivros);
                             break;
                         case 5:
-                            mensagem = "Encerrando programa";
+                            mensagem = "Encerrando ...";
                             saida.writeObject(mensagem);
                             return;
                         default:
-                            System.out.println("Opção inválida. Tente novamente.");
+                            mensagem = "Opção invalida, tente novamente ...";
+                            saida.writeObject(mensagem);
+
                             break;
                     }
+
                 }
+
 
             } catch (IOException e) {
                 e.printStackTrace();
@@ -82,10 +90,35 @@ public class Server {
         }
         saida.writeObject(null);
     }
-    public static void alugarLivro(){
+    public static void devolverOuAlugar(String acao, List<Livro> livros, String tituloLivro, ObjectOutputStream saida, Map<String, List<Livro>> objetoLivros) throws IOException {
 
-    }
-    public static void devolverLivro(){
+        boolean encontrado = false;
 
+        for (Livro livro : livros) {
+            if (livro.getTitulo().equals(tituloLivro)) {
+                if (livro.getExemplares() > 0 ){
+                    if (acao ==  "alugar") {
+                        livro.setExemplares(livro.getExemplares() - 1);
+                    } else {
+                        livro.setExemplares(livro.getExemplares() + 1);
+                    }
+                    objectMapper.writeValue(new File("livros.json"), objetoLivros);
+                    saida.writeObject("Livro alugado com sucesso: " + livro);
+
+                }else {
+
+                    saida.writeObject("Livro não tem exemplares disponiveis");
+                }
+                encontrado = true;
+
+                break;
+            }
+        }
+        if(!encontrado){
+            saida.writeObject("Livro não existe na lista");
+        }
+        saida.writeObject(null);
     }
+
+
 }

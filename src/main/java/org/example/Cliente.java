@@ -18,12 +18,12 @@ public class Cliente {
 
                 System.out.println("Selecione uma opção:");
                 System.out.println("1. Adicionar livro");
-                System.out.println("2. Alugar livro");
-                System.out.println("3. Listar livros");
+                System.out.println("2. Listar livros");
+                System.out.println("3. Alugar livro");
                 System.out.println("4. Devolver livros");
                 System.out.println("5. Sair");
                 int escolha = Integer.parseInt(reader.readLine());
-
+                String titulo;
                 switch (escolha) {
                     case 1:
 
@@ -35,20 +35,32 @@ public class Cliente {
 
                         saida.writeObject(escolha);
                         while ((mensagem = (String) entrada.readObject()) != null){
-                            System.out.println("Livro: " + mensagem);
+                            System.out.println(mensagem);
                         }
 
                         break;
                     case 3:
+                        System.out.println("Digite o titulo do livro que voce quer alugar:");
+                        titulo = reader.readLine();
 
                         saida.writeObject(escolha);
-                        System.out.println((String) entrada.readObject());
+                        saida.writeObject(titulo);
+                        while ((mensagem = (String) entrada.readObject()) != null){
+                            System.out.println(mensagem);
+                        }
+
                         break;
                     case 4:
 
+                        System.out.println("Digite o titulo do livro que voce quer devolver:");
+                        titulo = reader.readLine();
+
                         saida.writeObject(escolha);
-                        System.out.println((String) entrada.readObject());
-                        return;
+                        saida.writeObject(titulo);
+                        while ((mensagem = (String) entrada.readObject()) != null){
+                            System.out.println(mensagem);
+                        }
+                        break;
                     case 5:
 
                         saida.writeObject(escolha);

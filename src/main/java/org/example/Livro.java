@@ -44,10 +44,10 @@ public class Livro {
     @Override
     public String toString() {
         return "Livro: " +
-                ", nome='" + titulo + '\'' +
-                "autor='" + autor + '\'' +
-                ", genero='" + genero + '\'' +
-                ", exemplares=" + exemplares ;
+                "nome = '" + titulo + '\'' +
+                ", autor = '" + autor + '\'' +
+                ", genero = '" + genero + '\'' +
+                ", exemplares = " + exemplares ;
     }
 }
 
