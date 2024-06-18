@@ -7,7 +7,14 @@ public class Livro {
     private String genero;
     private int exemplares;
 
+    public Livro (){}
 
+    public Livro (String autor, String titulo, String genero, int exemplares){
+        this.autor = autor;
+        this.titulo =  titulo;
+        this.genero = genero;
+        this.exemplares = exemplares;
+    }
 
     public String getAutor() {
         return autor;

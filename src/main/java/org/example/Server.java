@@ -23,10 +23,8 @@ public class Server {
             try {
                 ObjectMapper objectMapper = new ObjectMapper();
 
-
                 Map<String, List<Livro>> objetoLivros = objectMapper.readValue(new File("livros.json"), new TypeReference<Map<String, List<Livro>>>(){});
                 List<Livro> listaDeLivros = objetoLivros.get("livros");
-
 
                 ServerSocket conexao = new ServerSocket(12345);
                 System.out.println("Esperando cliente conectar");
@@ -36,26 +34,23 @@ public class Server {
 
                 while(true) {
                     String mensagem;
-                    String titulo;
                     Integer escolha = (Integer) entrada.readObject();
                     switch (escolha) {
                         case 1:
-                            mensagem = "Teste 1";
-                            saida.writeObject(mensagem);
+                            adicionarLivro(listaDeLivros, entrada, saida, objetoLivros);
+
                             break;
                         case 2:
-
                             listarLivros(listaDeLivros, saida);
 
                             break;
                         case 3:
-                            titulo = (String)  entrada.readObject();
-                            devolverOuAlugar("alugar", listaDeLivros, titulo, saida, objetoLivros);
+                            devolverOuAlugar("alugar", listaDeLivros, entrada, saida, objetoLivros);
 
                             break;
                         case 4:
-                            titulo = (String)  entrada.readObject();
-                            devolverOuAlugar("devolver", listaDeLivros, titulo, saida, objetoLivros);
+                            devolverOuAlugar("devolver", listaDeLivros, entrada, saida, objetoLivros);
+
                             break;
                         case 5:
                             mensagem = "Encerrando ...";
@@ -78,9 +73,22 @@ public class Server {
             }
         }
 
+    private static void adicionarLivro(List<Livro> listaDeLivros, ObjectInputStream entrada, ObjectOutputStream saida, Map<String, List<Livro>> objetoLivros) throws IOException, ClassNotFoundException {
+        // Ler informações do livro do cliente
+        String autor = (String) entrada.readObject();
+        String titulo = (String) entrada.readObject();
+        String genero = (String) entrada.readObject();
+        int exemplares  = (Integer) entrada.readObject();
 
-    public static void adicionarLivro(){
 
+        Livro novoLivro = new Livro(autor, titulo, genero, exemplares);
+        listaDeLivros.add(novoLivro);
+
+        objetoLivros.put("livros", listaDeLivros);
+        objectMapper.writeValue(new File("livros.json"), objetoLivros);
+
+        saida.writeObject("Livro adicionado com sucesso.");
+        saida.writeObject(null);
     }
 
     public static void listarLivros(List<Livro> livros, ObjectOutputStream saida) throws IOException {
@@ -90,18 +98,21 @@ public class Server {
         }
         saida.writeObject(null);
     }
-    public static void devolverOuAlugar(String acao, List<Livro> livros, String tituloLivro, ObjectOutputStream saida, Map<String, List<Livro>> objetoLivros) throws IOException {
 
+    public static void devolverOuAlugar(String acao, List<Livro> livros, ObjectInputStream entrada,ObjectOutputStream saida, Map<String, List<Livro>> objetoLivros) throws IOException, ClassNotFoundException {
+
+        String titulo = (String)  entrada.readObject();
         boolean encontrado = false;
 
         for (Livro livro : livros) {
-            if (livro.getTitulo().equals(tituloLivro)) {
+            if (livro.getTitulo().equals(titulo)) {
                 if (livro.getExemplares() > 0 ){
                     if (acao ==  "alugar") {
                         livro.setExemplares(livro.getExemplares() - 1);
                     } else {
                         livro.setExemplares(livro.getExemplares() + 1);
                     }
+                    objetoLivros.put("livros", livros);
                     objectMapper.writeValue(new File("livros.json"), objetoLivros);
                     saida.writeObject("Livro alugado com sucesso: " + livro);
 
