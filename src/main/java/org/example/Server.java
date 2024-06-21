@@ -37,7 +37,7 @@ public class Server {
                     Integer escolha = (Integer) entrada.readObject();
                     switch (escolha) {
                         case 1:
-                            adicionarLivro(listaDeLivros, entrada, saida, objetoLivros);
+                            cadastrarLivro(listaDeLivros, entrada, saida, objetoLivros);
 
                             break;
                         case 2:
@@ -45,11 +45,11 @@ public class Server {
 
                             break;
                         case 3:
-                            devolverOuAlugar("alugar", listaDeLivros, entrada, saida, objetoLivros);
+                            alugarLivro( listaDeLivros, entrada, saida, objetoLivros);
 
                             break;
                         case 4:
-                            devolverOuAlugar("devolver", listaDeLivros, entrada, saida, objetoLivros);
+                            devolverLivro(listaDeLivros, entrada, saida, objetoLivros);
 
                             break;
                         case 5:
@@ -62,9 +62,8 @@ public class Server {
 
                             break;
                     }
-
+                    saida.writeObject(null);
                 }
-
 
             } catch (IOException e) {
                 e.printStackTrace();
@@ -73,22 +72,34 @@ public class Server {
             }
         }
 
-    private static void adicionarLivro(List<Livro> listaDeLivros, ObjectInputStream entrada, ObjectOutputStream saida, Map<String, List<Livro>> objetoLivros) throws IOException, ClassNotFoundException {
-        // Ler informações do livro do cliente
+    private static void cadastrarLivro(List<Livro> livros, ObjectInputStream entrada, ObjectOutputStream saida, Map<String, List<Livro>> objetoLivros) throws IOException, ClassNotFoundException {
         String autor = (String) entrada.readObject();
         String titulo = (String) entrada.readObject();
         String genero = (String) entrada.readObject();
         int exemplares  = (Integer) entrada.readObject();
+        boolean cadastrado = false;
+
+        for (Livro livro : livros) {
+            if (livro.getTitulo().equals(titulo)) {
+
+                cadastrado = true;
+                saida.writeObject("Livro já cadastrado");
+                break;
+            }
+        }
+
+        if (!cadastrado){
+            Livro novoLivro = new Livro(autor, titulo, genero, exemplares);
+            livros.add(novoLivro);
+
+            objetoLivros.put("livros", livros);
+            objectMapper.writeValue(new File("livros.json"), objetoLivros);
+
+            saida.writeObject("Livro adicionado com sucesso.");
+
+        }
 
 
-        Livro novoLivro = new Livro(autor, titulo, genero, exemplares);
-        listaDeLivros.add(novoLivro);
-
-        objetoLivros.put("livros", listaDeLivros);
-        objectMapper.writeValue(new File("livros.json"), objetoLivros);
-
-        saida.writeObject("Livro adicionado com sucesso.");
-        saida.writeObject(null);
     }
 
     public static void listarLivros(List<Livro> livros, ObjectOutputStream saida) throws IOException {
@@ -96,40 +107,63 @@ public class Server {
         for (Livro livro : livros) {
             saida.writeObject(livro.toString());
         }
-        saida.writeObject(null);
+
     }
 
-    public static void devolverOuAlugar(String acao, List<Livro> livros, ObjectInputStream entrada,ObjectOutputStream saida, Map<String, List<Livro>> objetoLivros) throws IOException, ClassNotFoundException {
+    public static void alugarLivro(List<Livro> livros, ObjectInputStream entrada,ObjectOutputStream saida, Map<String, List<Livro>> objetoLivros) throws IOException, ClassNotFoundException {
+
 
         String titulo = (String)  entrada.readObject();
         boolean encontrado = false;
 
         for (Livro livro : livros) {
             if (livro.getTitulo().equals(titulo)) {
+
+                encontrado = true;
+
                 if (livro.getExemplares() > 0 ){
-                    if (acao ==  "alugar") {
-                        livro.setExemplares(livro.getExemplares() - 1);
-                    } else {
-                        livro.setExemplares(livro.getExemplares() + 1);
-                    }
+
+                    livro.setExemplares(livro.getExemplares() - 1);
                     objetoLivros.put("livros", livros);
                     objectMapper.writeValue(new File("livros.json"), objetoLivros);
                     saida.writeObject("Livro alugado com sucesso: " + livro);
 
-                }else {
-
-                    saida.writeObject("Livro não tem exemplares disponiveis");
+                    break;
                 }
+
+                saida.writeObject("Livro não tem exemplares disponiveis");
+                break;
+            }
+        }
+        if(!encontrado){
+
+            saida.writeObject("Livro não existe na lista");
+        }
+    }
+
+    public static void devolverLivro( List<Livro> livros, ObjectInputStream entrada,ObjectOutputStream saida, Map<String, List<Livro>> objetoLivros) throws IOException, ClassNotFoundException {
+
+        String titulo = (String)  entrada.readObject();
+        boolean encontrado = false;
+
+        for (Livro livro : livros) {
+            if (livro.getTitulo().equals(titulo)) {
+
                 encontrado = true;
+
+                livro.setExemplares(livro.getExemplares() + 1);
+
+                objetoLivros.put("livros", livros);
+                objectMapper.writeValue(new File("livros.json"), objetoLivros);
+                saida.writeObject("Livro devolvido com sucesso: " + livro);
 
                 break;
             }
         }
         if(!encontrado){
-            saida.writeObject("Livro não existe na lista");
-        }
-        saida.writeObject(null);
-    }
 
+            saida.writeObject("Livro não existe em nossa biblioteca, caso queira adicionar selecione a opção de adicionar no menu");
+        }
+    }
 
 }

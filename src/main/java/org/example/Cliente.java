@@ -23,7 +23,7 @@ public class Cliente {
                 int exemplares;
 
                 System.out.println("Selecione uma opção:");
-                System.out.println("1. Adicionar livro");
+                System.out.println("1. Cadastrar livro");
                 System.out.println("2. Listar livros");
                 System.out.println("3. Alugar livro");
                 System.out.println("4. Devolver livros");
@@ -32,16 +32,16 @@ public class Cliente {
 
                 switch (escolha) {
                     case 1:
-                        System.out.println("Digite o autor do livro que voce vai adicionar:");
+                        System.out.println("Digite o autor do livro que voce vai cadastrar:");
                         autor = reader.readLine();
 
-                        System.out.println("Digite o titulo do livro que voce vai adicionar:");
+                        System.out.println("Digite o titulo do livro que voce vai cadastrar:");
                         titulo = reader.readLine();
 
-                        System.out.println("Digite o genero do livro que voce vai adicionar:");
+                        System.out.println("Digite o genero do livro que voce vai cadastrar:");
                         genero = reader.readLine();
 
-                        System.out.println("Digite quantos exemplares do livro que voce vai adicionar:");
+                        System.out.println("Digite quantos exemplares do livro que voce vai cadastrar:");
                         exemplares = Integer.parseInt(reader.readLine());
 
                         saida.writeObject(escolha);
