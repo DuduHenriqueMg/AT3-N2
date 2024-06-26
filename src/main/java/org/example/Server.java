@@ -1,7 +1,6 @@
 package org.example;
 
 import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.io.File;
@@ -21,9 +20,8 @@ public class Server {
     public static void main(String[] args) {
 
             try {
-                ObjectMapper objectMapper = new ObjectMapper();
 
-                Map<String, List<Livro>> objetoLivros = objectMapper.readValue(new File("livros.json"), new TypeReference<Map<String, List<Livro>>>(){});
+                Map<String, List<Livro>> objetoLivros = objectMapper.readValue(new File("livros.json"), new TypeReference<>() {});
                 List<Livro> listaDeLivros = objetoLivros.get("livros");
 
                 ServerSocket conexao = new ServerSocket(12345);
@@ -65,12 +63,10 @@ public class Server {
                     saida.writeObject(null);
                 }
 
-            } catch (IOException e) {
-                e.printStackTrace();
-            } catch (ClassNotFoundException e) {
+            } catch (IOException | ClassNotFoundException e) {
                 e.printStackTrace();
             }
-        }
+    }
 
     private static void cadastrarLivro(List<Livro> livros, ObjectInputStream entrada, ObjectOutputStream saida, Map<String, List<Livro>> objetoLivros) throws IOException, ClassNotFoundException {
         String autor = (String) entrada.readObject();
