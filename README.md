@@ -2,7 +2,7 @@
 
 ## Descrição do Projeto
 
-<p id="sobre">Projeto da matéria de programação concorrente e distribuída feito em Java que implementa um servidor utilizando sockets com função de controlar o registro/cadastro e aluguel e devolução de livros de uma biblioteca. Esse projeto também possui um cliente que se conecta com o servidor para solicitar e enviar dados através da conexão via socket. Além disso, os livros da biblioteca estão armazenados em um arquivo JSON e a manipulação dos dados dos livros fica or conta do servidor. </p>
+<p id="sobre">Projeto da matéria de programação concorrente e distribuída feito em Java que implementa um servidor utilizando sockets com função de controlar o registro/cadastro e aluguel e devolução de livros de uma biblioteca. Esse projeto também possui um cliente que se conecta com o servidor para solicitar e enviar dados através da conexão via socket. Além disso, os livros da biblioteca estão armazenados em um arquivo JSON e a manipulação dos dados dos livros fica por conta do servidor. </p>
 
 
 <h4 align="center"> 
